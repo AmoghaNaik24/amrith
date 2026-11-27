@@ -1,0 +1,25 @@
+:root{--bg:#1b1233;--lav:#c9b6f2;--rose:#8c1c3a;--txt:#f3ecff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--txt);font-family:Inter,sans-serif;background:radial-gradient(circle at 20% 0,#3b2a6b,var(--bg) 60%);overflow-x:hidden}
+h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:700;margin:.3em 0}
+.wrap{max-width:640px;margin:0 auto;padding:20px;position:relative}
+.center{text-align:center;padding-top:12vh}
+.card{background:rgba(255,255,255,.08);backdrop-filter:blur(10px);border:1px solid rgba(201,182,242,.25);border-radius:18px;padding:18px;margin:14px 0}
+.hand{font-family:'Dancing Script',cursive;font-size:1.35rem;white-space:pre-wrap;line-height:1.5}
+button,.btn{background:var(--rose);color:#fff;border:0;border-radius:999px;padding:12px 22px;font-size:1rem;cursor:pointer;text-decoration:none;display:inline-block}
+button.ghost,.btn.ghost{background:transparent;border:1px solid var(--lav);color:var(--lav)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--lav);outline-offset:2px}
+textarea,input{width:100%;background:rgba(0,0,0,.25);color:var(--txt);border:1px solid rgba(201,182,242,.35);border-radius:12px;padding:12px;font:inherit;margin:6px 0}
+textarea{min-height:90px}
+.clocks{display:flex;gap:10px;flex-wrap:wrap}.clocks .card{flex:1;min-width:140px;margin:6px 0;text-align:center}
+.count{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--lav)}
+.env{font-size:4rem;animation:beat 2.4s infinite;background:none;padding:0}
+@keyframes beat{50%{transform:scale(1.1)}}
+.moon{font-size:3rem}.small{opacity:.7;font-size:.85rem}
+.star{position:fixed;width:3px;height:3px;border-radius:50%;background:#fff;animation:tw 3s infinite;pointer-events:none}
+@keyframes tw{50%{opacity:.1}}
+.bf{position:fixed;font-size:1.6rem;animation:fly 18s linear infinite;pointer-events:none;opacity:.7}
+@keyframes fly{from{transform:translate(-10vw,100vh)}to{transform:translate(100vw,-20vh)}}
+.yesno{position:relative;height:120px}
+.yesno .no{position:absolute;transition:all .15s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
