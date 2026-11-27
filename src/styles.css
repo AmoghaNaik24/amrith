@@ -114,3 +114,5 @@ button.secondary,.button.secondary{background:transparent;border-color:var(--lin
 .note-card>span{color:#f4bfd4;font-size:1.35rem}
 .note-card p{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.35rem;line-height:1.4;color:#f4e5f1;margin:8px 0 0}
 @media(max-width:560px){.little-notes{grid-template-columns:1fr}.note-card{min-height:unset}}
+
+.morning-note{margin:18px 0 34px;padding:24px 28px;text-align:left}.morning-note .handwritten{white-space:pre-wrap;font-size:1.16rem;line-height:1.8;margin:12px 0 0;color:#fff0f6}.morning-note .muted{margin-bottom:0}
