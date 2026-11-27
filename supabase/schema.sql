@@ -170,15 +170,15 @@ create policy "Admins update private memories" on storage.objects
 for update to authenticated using (bucket_id='amrith-private' and public.is_admin())
 with check (bucket_id='amrith-private' and public.is_admin());
 
-insert into public.chapters(chapter_number,chapter_date,title,song_title,song_artist,message) values
-(1,'2026-11-27','A Little Warmth','Until I Found You','Stephen Sanchez',$$Some nights don't need long conversations or big promises.
+insert into public.chapters(chapter_number,chapter_date,title,song_title,song_artist,song_url,message) values
+(1,'2026-11-27','A Little Warmth','Until I Found You','Stephen Sanchez','https://www.youtube.com/watch?v=9C7FGC-ibY4',$Some nights don't need long conversations or big promises.
 
 Sometimes, all I want is to remind you that you are loved.
 
 I hope you sleep peacefully tonight, knowing that somewhere, someone is smiling because you exist.
 
 Goodnight, my favourite person. ❤️$$),
-(2,'2026-11-28','Growing Together','Shinunoga E-Wa','Fujii Kaze',$$Questions I once carried:
+(2,'2026-11-28','Growing Together','Shinunoga E-Wa','Fujii Kaze','https://www.youtube.com/watch?v=dawrQnvwMTY',$Questions I once carried:
 
 "Will you really promise me that you will always treat me the same way till the end?"
 "Will you forgive me if I did something that you hate?"
@@ -188,18 +188,18 @@ Goodnight, my favourite person. ❤️$$),
 "You are 26, I'm 20. Your needs are different from mine. Would it affect?"
 
 I didn't want a perfect person. I wanted someone with whom I could grow without having to lose myself.$$),
-(3,'2026-11-29','Feeling Like Home','Love Story','Taylor Swift',$$"What if you take me for granted and leave me in grief?"
+(3,'2026-11-29','Feeling Like Home','Love Story','Taylor Swift','https://www.youtube.com/watch?v=8xg3vE8Ie_E',$"What if you take me for granted and leave me in grief?"
 "You think like my mom, care like my brother and protect like my dad. I'll feel home with you."
 "Would you disrespect me for anything?"
 
 Maybe feeling at home isn't about a place. Maybe it's about being able to be yourself around someone without being afraid.$$),
-(4,'2026-11-30','The Little Things','Like My Father','Jax',$$"I'll die for you if you bring me flowers and open the door for me to sit."
+(4,'2026-11-30','The Little Things','Like My Father','Jax','https://www.youtube.com/watch?v=GCWl50HQZIM',$"I'll die for you if you bring me flowers and open the door for me to sit."
 "I'm searching to give something as a mark of my presence, but everything I brought is not on my own."
 "So I can only give you a hug which you can carry until you see me again."
 "Will you meet me again before you leave India?"
 
 Sometimes the smallest gestures mean more than the most expensive gifts. I never wanted grand things. I wanted thoughtful things.$$),
-(5,'2026-12-01','Across the Distance','Hey There Delilah','Plain White T''s',$$"It's easy to love yourself than loving someone, and I see you as a person with same mindset."
+(5,'2026-12-01','Across the Distance','Hey There Delilah','Plain White T''s','https://www.youtube.com/watch?v=EbJtYqBYCV8',$"It's easy to love yourself than loving someone, and I see you as a person with same mindset."
 "Would you fulfill all my dreams?"
 "You shouldn't feel stressed in loving someone in any aspect, either career, future or anything."
 "And I'm exactly feeling zero percent stress about you. I think I'm sure about you."
@@ -208,7 +208,7 @@ Sometimes the smallest gestures mean more than the most expensive gifts. I never
 "Is there anything that you are hiding with me? A bad thing?"
 
 I don't want either of us to feel that love is an obstacle to our ambitions. I want us to become better people while supporting each other.$$),
-(6,'2026-12-02','The Anticipation','Blinding Lights','The Weeknd',$$"I feel like you are perfect. Is there anything that you are hiding with me? A bad thing?"
+(6,'2026-12-02','The Anticipation','Blinding Lights','The Weeknd','https://www.youtube.com/watch?v=4NRXx6U8ABQ',$"I feel like you are perfect. Is there anything that you are hiding with me? A bad thing?"
 "Always feel you are better than me, smarter than me, taller than me, hotter than me."
 "So I wouldn't care giving my hand to you."
 
@@ -217,14 +217,14 @@ I have had so many questions in my mind. Some were serious, some were silly, and
 But here we are.
 
 I can't wait to see you.$$),
-(7,'2026-12-03','The Night Before','Perfect','Ed Sheeran',$$Tomorrow is no longer just a date on the calendar.
+(7,'2026-12-03','The Night Before','Perfect','Ed Sheeran','https://www.youtube.com/watch?v=2Vv-BfVoq4g',$Tomorrow is no longer just a date on the calendar.
 
 It is a moment we have talked about, imagined, and waited for.
 
 I don't know whether I'll be nervous, excited, silent, or smiling continuously.
 
 But I know that tomorrow will become a memory.$$),
-(8,'2026-12-04','Finally, The Day','Perfect','Ed Sheeran',$$THE COUNTDOWN IS OVER.
+(8,'2026-12-04','Finally, The Day','Perfect','Ed Sheeran','https://www.youtube.com/watch?v=2Vv-BfVoq4g',$THE COUNTDOWN IS OVER.
 DECEMBER 04, 2026
 WE FINALLY MADE IT HERE.
 
