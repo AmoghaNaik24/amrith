@@ -1,91 +1,42 @@
 # AMRITH · OPERATION: FIRST MEET 🦋
 
-A private, responsive two-person experience built with React, Vite and Supabase. Designed for laptop, iPad and mobile screens.
+A private-feeling, responsive two-person experience built with React and Vite. **The app now runs in local-only mode**: no Supabase connection, no account sync, and no remote database or media storage.
 
-## What's included
+## Sign in
+- Name: `Amogha` or `Thrinath` (case-insensitive).
+- Shared password: configure `VITE_APP_PASSWORD` as a GitHub Actions secret for the published site.
+- For local development, copy `.env.example` to `.env` and set the same variable.
 
-- Private email/password sign-in for Ammu and Thrinath.
-- Eight chapters (27 November–4 December 2026). All chapters are available to signed-in members immediately; the dashboard shows the Hyderabad (IST) and Arizona (MST) clocks and countdown to 4 December, 5:00 PM MST.
-- The original eight chapter messages and question prompts, with verified official YouTube links prefilled for the requested songs.
-- Shared question threads with realtime updates.
-- A private Supabase Storage gallery: 3 image slots per chapter for Days 1–7; 10 image/video slots for Day 8. Uploads are limited to 50 MB per file and can be previewed, captioned, replaced or removed.
-- Dream Boy checklist with the exact groups “Already fulfilled”, “Yet to be discovered”, and “Something we must understand together”. Each member's checked items and private notes are saved separately; admins can edit, move and reorder items. “Age gap” is in the third group.
-- Editable nine-milestone “Our Story” timeline, retaining the original seven story beats and adding two undated connective moments. Only the first and final milestones have dates (27 November and 4 December).
-- Shared promises and a time capsule with scheduled reveal times.
-- Admin studio to edit chapter messages/titles/song links, edit timeline milestones, edit the final letter, and preview the member view as Thrinath.
-- Animated final-letter envelope and a persistent music dock. Direct audio URLs (MP3/M4A/OGG/WAV) support a gentle volume fade; YouTube/Spotify embeds use their own playback controls.
-- Lavender night-sky styling, roses, butterflies, stars, and reduced-motion support.
+## Local-only behaviour
+- Each browser/device keeps its own chapters, edits, checklist, responses, promises, time-capsule entries, gallery metadata and uploaded media.
+- Text/data is saved in that browser's local storage; uploaded media is saved in that browser's IndexedDB.
+- Nothing is transmitted to another device. If Amogha edits a chapter on her laptop, Thrinath will not see that edit on his device.
+- Clearing browser site data, using a different browser/profile, or switching devices creates a separate empty local copy. Back up important memories before clearing browser data.
+- Gallery uploads are local to the device and may use significant browser storage. Browser storage can be cleared by the browser/operating system.
 
-## 1. Create Supabase project
+## Features
+- Eight original chapters, chapter editing and song links.
+- Hyderabad and Arizona clocks with countdown to December 4, 2026.
+- Per-device response threads, gallery with image/video support on the final day, captions and replacement/removal.
+- Dream Boy checklist with per-user local checkmarks and notes.
+- Editable story timeline, promises, time capsule and final letter.
+- Admin tools and Thrinath preview.
 
-Create a Supabase project. In **SQL Editor → New query**, paste the complete contents of supabase/schema.sql and run it once.
+## Deploy to GitHub Pages
+1. In GitHub, open **Settings → Secrets and variables → Actions**.
+2. Add a repository secret named `VITE_APP_PASSWORD` with the shared password.
+3. Ensure Pages uses **GitHub Actions** as its source.
+4. Run **Actions → Deploy → Run workflow** on `main`, or push a new commit.
 
-This schema creates the database tables, row-level security policies, the private amrith-private storage bucket, the gallery upload rules, and the initial chapters/questions/timeline/checklist content. Do not run an older copy of the schema.
+The published URL remains `https://amoghanaik24.github.io/amrith/`.
 
-## 2. Create the two login accounts
+## Privacy warning
+This is a static client-side site. The name/password screen is a lightweight gate, not strong authentication: a visitor with technical access to the published JavaScript can inspect or bypass it. Do not store sensitive or confidential information here. For genuine private access, deploy behind server-side authentication or a protected hosting layer.
 
-In Supabase, open **Authentication → Users → Add user**.
-
-Create two email/password users:
-- Ammu
-- Thrinath
-
-Use email addresses and passwords that you control. Enable email auto-confirm for these two manually created users if Supabase asks. Turn off public sign-ups so nobody else can create an account.
-
-## 3. Add their profiles
-
-For each user, copy the UUID shown in Authentication → Users. In **SQL Editor → New query**, replace the two placeholders and run:
-
-~~~sql
-insert into public.profiles (id, display_name, role, timezone)
-values
-  ('AMMU-UUID', 'Ammu', 'admin', 'Asia/Kolkata'),
-  ('THRINATH-UUID', 'Thrinath', 'member', 'America/Phoenix');
-~~~
-
-Do not share either password or the Supabase service-role key. The frontend uses only the publishable/anon key.
-
-## 4. Configure local development (optional)
-
-Copy .env.example to .env and fill in:
-- VITE_SUPABASE_URL: Supabase Project URL
-- VITE_SUPABASE_ANON_KEY: Supabase publishable key (or legacy anon key)
-
-Then run:
-
-~~~bash
+## Local development
+```bash
+cp .env.example .env
 npm install
 npm run dev
-~~~
-
-## 5. Deploy with GitHub Pages
-
-In the GitHub repository, open **Settings → Secrets and variables → Actions** and add:
-- VITE_SUPABASE_URL
-- VITE_SUPABASE_ANON_KEY
-
-Use the publishable/anon key only. Never put service_role or a Supabase secret key in a Vite environment variable.
-
-Then open **Settings → Pages** and choose **GitHub Actions** as the source. Push to main (or run the Deploy workflow manually). The site URL will be:
-
-~~~text
-https://AmoghaNaik24.github.io/amrith/
-~~~
-
-## 6. Add song links
-
-Sign in as Ammu, open a chapter, and choose **Edit this chapter**. Add a YouTube, Spotify track, or direct audio URL, then save. The music dock stays visible while navigating between the website sections.
-
-## Privacy and permissions
-
-- All application tables use Row Level Security.
-- Only the two profiles in profiles can read the app's private content.
-- Gallery files live in a private Storage bucket. Authenticated members can view shared gallery media; uploads are stored under the uploader's user ID.
-- Never expose the Supabase service-role/secret key in frontend code or GitHub Pages secrets.
-- The “Preview as Thrinath” control is a visual preview, not account impersonation. It does not change permissions or sign in as another user.
-
-## Notes
-
-- The SQL schema is intended for a fresh Supabase project and should be run once.
-- Media is stored in Supabase Storage; the database stores only its metadata and private object path.
-- YouTube and Spotify playback is controlled by their embedded players. Direct audio files use the site's play/pause control and volume fade.
+```
+Set a private value for `VITE_APP_PASSWORD` in `.env`. Never commit `.env`.
