@@ -57,6 +57,7 @@ create table public.gallery_media (
   storage_path text not null unique,
   media_kind text not null check (media_kind in ('image','video')),
   original_name text,
+  caption text not null default '',
   uploaded_by uuid not null references public.profiles(id) on delete cascade,
   created_at timestamptz not null default now(),
   unique(chapter_number,slot_number),
@@ -76,6 +77,7 @@ create table public.checklist_responses (
   item_id bigint not null references public.checklist_items(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
   checked boolean not null default false,
+  notes text not null default '',
   updated_at timestamptz not null default now(),
   primary key(item_id,user_id)
 );
@@ -133,7 +135,7 @@ create policy "Members edit their own responses" on public.responses for update 
 create policy "Members view gallery" on public.gallery_media for select to authenticated using (public.is_member());
 create policy "Members upload their own gallery items" on public.gallery_media for insert to authenticated with check (uploaded_by=auth.uid() and public.is_member());
 create policy "Owners and admins delete gallery items" on public.gallery_media for delete to authenticated using (uploaded_by=auth.uid() or public.is_admin());
-create policy "Admins manage gallery metadata" on public.gallery_media for update to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Owners and admins update gallery metadata" on public.gallery_media for update to authenticated using (uploaded_by=auth.uid() or public.is_admin()) with check (uploaded_by=auth.uid() or public.is_admin());
 create policy "Members view checklist items" on public.checklist_items for select to authenticated using (public.is_member());
 create policy "Admins manage checklist items" on public.checklist_items for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "Members view checklist responses" on public.checklist_responses for select to authenticated using (public.is_member());
