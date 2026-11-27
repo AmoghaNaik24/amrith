@@ -8,8 +8,8 @@ A private, responsive two-person experience built with React, Vite and Supabase.
 - Eight chapters (27 November–4 December 2026). All chapters are available to signed-in members immediately; the dashboard shows the Hyderabad (IST) and Arizona (MST) clocks and countdown to 4 December, 5:00 PM MST.
 - The original eight chapter messages and question prompts, with verified official YouTube links prefilled for the requested songs.
 - Shared question threads with realtime updates.
-- A private Supabase Storage gallery: 3 image slots per chapter for Days 1–7; 10 image/video slots for Day 8. Uploads are limited to 50 MB per file.
-- Dream Boy checklist with the exact groups “Already fulfilled”, “Yet to be discovered”, and “Something we must understand together”. Each member's checked items are saved separately; “Age gap” is in the third group.
+- A private Supabase Storage gallery: 3 image slots per chapter for Days 1–7; 10 image/video slots for Day 8. Uploads are limited to 50 MB per file and can be previewed, captioned, replaced or removed.
+- Dream Boy checklist with the exact groups “Already fulfilled”, “Yet to be discovered”, and “Something we must understand together”. Each member's checked items and private notes are saved separately; admins can edit, move and reorder items. “Age gap” is in the third group.
 - Editable nine-milestone “Our Story” timeline, retaining the original seven story beats and adding two undated connective moments. Only the first and final milestones have dates (27 November and 4 December).
 - Shared promises and a time capsule with scheduled reveal times.
 - Admin studio to edit chapter messages/titles/song links, edit timeline milestones, edit the final letter, and preview the member view as Thrinath.
