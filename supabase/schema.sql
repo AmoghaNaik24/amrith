@@ -272,15 +272,15 @@ insert into public.checklist_items(group_name,label,sort_order) values
 ('Something we must understand together','Age gap',25);
 
 insert into public.story_milestones(sort_order,title,description,event_date) values
-(1,'A little beginning','Somewhere, a conversation began to turn into a story.','2026-11-27'),
-(2,'The conversations that stayed','Ordinary chats slowly became something we looked forward to.',null),
-(3,'Questions, honesty and curiosity','We started sharing the questions that mattered, not just the easy answers.',null),
-(4,'Two clocks, one little world','Hyderabad and Arizona became part of the same everyday story.',null),
-(5,'Thoughtful little surprises','Small gestures began carrying a lot more meaning.',null),
-(6,'Dreams that deserve room','Two individual futures, with space to encourage each other.',null),
-(7,'The countdown begins','A date on the calendar started feeling closer with every day.',null),
-(8,'Almost there','A first meeting, imagined in a hundred different little ways.',null),
-(9,'The day we finally meet','A new memory, made in person.','2026-12-04');
+(1,'The beginning','How your story started.','2026-11-27'),
+(2,'The conversations','Little moments that became important.',null),
+(3,'The questions','Your doubts and his answers.',null),
+(4,'The growing trust','The things you learned about each other.',null),
+(5,'The little surprises','Thoughtful gestures and moments that made the distance feel smaller.',null),
+(6,'The anticipation','Waiting to meet.',null),
+(7,'The night before','What you both are feeling.',null),
+(8,'A little more of us','The small memories and hopes you are carrying into this new chapter.',null),
+(9,'December 4','The first meet, and the beginning of a new memory.','2026-12-04');
 
 insert into public.app_settings(key,value) values
 ('final_letter',$$A giver always deserves another giver, and I will be your giver forever.
