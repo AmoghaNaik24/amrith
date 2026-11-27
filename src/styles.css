@@ -82,3 +82,5 @@ button.secondary,.button.secondary{background:transparent;border-color:var(--lin
 .close-letter{position:absolute;right:18px;top:12px;font-size:1.6rem}
 .letter-signoff{text-align:right;font-size:2rem;margin-top:24px}
 @keyframes fade-in{from{opacity:0}to{opacity:1}}@keyframes letter-open{from{opacity:0;transform:translateY(35px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.yesno-panel{position:relative;height:135px;padding-top:12px}.no-dodge{position:absolute;transition:left .16s,top .16s}
