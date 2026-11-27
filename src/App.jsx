@@ -1,132 +1,37 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { sb } from './supabase'
 
-const OFFSET = { 'Asia/Kolkata': 330, 'America/Phoenix': -420 } // minutes; neither zone has DST
-const useNow = () => { const [n, s] = useState(new Date()); useEffect(() => { const t = setInterval(() => s(new Date()), 1000); return () => clearInterval(t) }, []); return n }
-const clock = (d, tz) => d.toLocaleString('en-GB', { timeZone: tz, dateStyle: 'medium', timeStyle: 'medium' })
-
-function Sky() {
-  const stars = useRef([...Array(25)].map(() => ({ l: Math.random() * 100, t: Math.random() * 100, d: Math.random() * 3 })))
-  return <>{stars.current.map((s, i) => <span key={i} className="star" style={{ left: s.l + 'vw', top: s.t + 'vh', animationDelay: s.d + 's' }} />)}
-    <span className="bf">🦋</span><span className="bf" style={{ animationDelay: '9s' }}>🦋</span></>
+const TZ = { 'Asia/Kolkata': 'Hyderabad · IST', 'America/Phoenix': 'Arizona · MST' }
+const SONGS = [
+  ['Until I Found You','Stephen Sanchez'],['Shinunoga E-Wa','Fujii Kaze'],['Love Story','Taylor Swift'],
+  ['Like My Father','Jax'],['Hey There Delilah',"Plain White T's"],['Blinding Lights','The Weeknd'],['Perfect','Ed Sheeran'],['Perfect','Ed Sheeran']
+]
+const fmt = (date, zone) => new Date(date).toLocaleString('en-GB',{timeZone:zone,dateStyle:'medium',timeStyle:'medium'})
+const uid = () => crypto.randomUUID()
+const mediaLimit = n => n === 8 ? 10 : 3
+const isVideo = f => f.type.startsWith('video/')
+const embedUrl = url => {
+  if (!url) return ''
+  const y = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/)
+  if (y) return 'https://www.youtube.com/embed/' + y[1] + '?enablejsapi=1'
+  const s = url.match(/open\.spotify\.com\/track\/([\w]+)/)
+  if (s) return 'https://open.spotify.com/embed/track/' + s[1]
+  return ''
 }
-
-function Login() {
-  const [email, setE] = useState(''), [pw, setP] = useState(''), [err, setErr] = useState('')
-  const go = async e => { e.preventDefault(); const { error } = await sb.auth.signInWithPassword({ email, password: pw }); if (error) setErr(error.message) }
-  return <form className="wrap card" onSubmit={go} style={{ marginTop: '15vh' }}>
-    <h2>Private entrance 🌙</h2>
-    <input aria-label="Email" type="email" placeholder="Email" value={email} onChange={e => setE(e.target.value)} />
-    <input aria-label="Password" type="password" placeholder="Password" value={pw} onChange={e => setP(e.target.value)} />
-    <button>Enter</button><p className="small">{err}</p></form>
-}
-
-function Welcome({ onEnter }) {
-  return <div className="wrap center">
-    <div className="moon">🌙</div><div>🌹 ✦ 🦋 ✦ 🌹</div>
-    <h1>Somewhere between today and forever...</h1>
-    <p>A little surprise is waiting for you.</p>
-    <p className="small">OPERATION: FIRST MEET</p>
-    <div style={{ fontSize: '3rem' }}>💌</div><br />
-    <button onClick={onEnter}>ENTER OUR LITTLE WORLD</button></div>
-}
-
-function Countdown({ tz }) {
-  const now = useNow()
-  const target = Date.UTC(2026, 11, 4, 17, 0) - OFFSET[tz] * 60000 // Dec 4, 5 PM in the viewer's own zone
-  const s = Math.floor(Math.max(0, target - now) / 1000)
-  return <>
-    <div className="clocks">
-      <div className="card"><div className="small">Hyderabad (IST)</div>{clock(now, 'Asia/Kolkata')}</div>
-      <div className="card"><div className="small">Arizona (MST)</div>{clock(now, 'America/Phoenix')}</div></div>
-    <div className="card" style={{ textAlign: 'center' }}><div className="count">
-      {Math.floor(s / 86400)}d {Math.floor(s % 86400 / 3600)}h {Math.floor(s % 3600 / 60)}m {s % 60}s</div>
-      <div className="small">until December 4</div></div></>
-}
-
-function songEmbed(url) {
-  if (!url) return null
-  const yt = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/); if (yt) return `https://www.youtube.com/embed/${yt[1]}`
-  const sp = url.match(/open\.spotify\.com\/track\/(\w+)/); if (sp) return `https://open.spotify.com/embed/track/${sp[1]}`
-  return null
-}
-function Song({ c }) {
-  const src = songEmbed(c.song_url), q = encodeURIComponent(`${c.song_title} ${c.song_artist}`)
-  return <div className="card"><div className="small">🎵 Today's song</div>
-    <b>{c.song_title}</b> — {c.song_artist}
-    {src ? <iframe title="song" src={src} width="100%" height="152" allow="encrypted-media" style={{ border: 0, marginTop: 8, borderRadius: 12 }} />
-      : <p><a className="btn ghost" target="_blank" rel="noreferrer" href={`https://www.youtube.com/results?search_query=${q}`}>Listen on YouTube</a></p>}</div>
-}
-
-function YesNo({ onYes }) {
-  const [pos, setPos] = useState({ left: '60%', top: 10 }), [done, setDone] = useState(false)
-  const dodge = e => { e.preventDefault(); setPos({ left: Math.random() * 70 + '%', top: Math.random() * 80 }) }
-  if (done) return <div className="center"><h2>MISSION ACCEPTED! 🦋</h2><p>Some things are better experienced than imagined.</p><p>See you soon.</p></div>
-  return <div className="yesno"><button onClick={() => { setDone(true); onYes() }}>YES ❤️</button>
-    <button className="no ghost" style={pos} onMouseEnter={dodge} onTouchStart={dodge} onClick={dodge} tabIndex={-1} aria-hidden="true">NO 🙃</button></div>
-}
-
-function Thread({ q, me, names }) {
-  const [rows, setRows] = useState([]), [txt, setTxt] = useState(''), [st, setSt] = useState('')
-  const load = async () => {
-    const { data } = await sb.from('responses').select('*').eq('question_id', q.id).order('created_at')
-    setRows(data || []); const mine = (data || []).find(r => r.user_id === me); if (mine) setTxt(t => t || mine.content)
-  }
-  useEffect(() => {
-    load()
-    const ch = sb.channel('r' + q.id).on('postgres_changes', { event: '*', schema: 'public', table: 'responses', filter: `question_id=eq.${q.id}` }, load).subscribe()
-    return () => { sb.removeChannel(ch) }
-  }, [q.id])
-  const save = async (content = txt) => {
-    setSt('Saving…')
-    const { error } = await sb.from('responses').upsert({ question_id: q.id, user_id: me, content, updated_at: new Date().toISOString() }, { onConflict: 'question_id,user_id' })
-    setSt(error ? 'Error: ' + error.message : 'Saved ✓')
-  }
-  const yesno = q.question_text.startsWith('ARE YOU READY')
-  const mine = rows.find(r => r.user_id === me)
-  return <div className="card"><h3>{q.question_text}</h3>
-    {yesno ? <YesNo onYes={() => save('YES ❤️')} /> : <>
-      {rows.filter(r => r.user_id !== me).map(r => <div key={r.id} className="hand">💬 {names[r.user_id] || 'Them'}: {r.content}
-        {r.updated_at > r.created_at && <span className="small"> (edited)</span>}</div>)}
-      <textarea aria-label="Your answer" value={txt} onChange={e => setTxt(e.target.value)} placeholder="Write here…" />
-      <button onClick={() => save()}>Save</button> <span className="small">{st}</span>
-      {mine && <div className="small">Last saved {new Date(mine.updated_at).toLocaleString()}</div>}</>}</div>
-}
-
-function Chapter({ c, me, names, back }) {
-  const [open, setOpen] = useState(false)
-  return <div className="wrap"><button className="ghost" onClick={back}>← Back</button>
-    <h2>Day {c.chapter_number} · {c.title}</h2><div className="small">{c.chapter_date}</div>
-    {!open ? <div style={{ textAlign: 'center', paddingTop: 30 }}><button className="env" aria-label="Open the envelope" onClick={() => setOpen(true)}>💌</button><p className="small">Tap to open</p></div>
-      : <><div className="card hand">{c.message}</div><Song c={c} />
-        {[...c.questions].sort((a, b) => a.sort_order - b.sort_order).map(q => <Thread key={q.id} q={q} me={me} names={names} />)}</>}</div>
-}
-
-function Home({ profile, chapters, pick }) {
-  return <div className="wrap"><h2>Hello, {profile.display_name} 🦋</h2>
-    <Countdown tz={profile.timezone} />
-    <h3>Your little surprises</h3>
-    {chapters.map(c => <div key={c.id} className="card" style={{ cursor: 'pointer' }} role="button" tabIndex={0} onClick={() => pick(c)} onKeyDown={e => e.key === 'Enter' && pick(c)}>
-      💌 Day {c.chapter_number} — {c.title}</div>)}
-    <div className="card small" style={{ textAlign: 'center' }}>Your next little surprise is resting. Come back later. 🌙</div></div>
-}
-
-export default function App() {
-  const [session, setSession] = useState(null), [ready, setReady] = useState(false)
-  const [profile, setProfile] = useState(null), [chapters, setChapters] = useState([]), [names, setNames] = useState({})
-  const [entered, setEntered] = useState(false), [cur, setCur] = useState(null)
-  useEffect(() => {
-    sb.auth.getSession().then(({ data }) => { setSession(data.session); setReady(true) })
-    const { data: l } = sb.auth.onAuthStateChange((_e, s) => setSession(s)); return () => l.subscription.unsubscribe()
-  }, [])
-  useEffect(() => {
-    if (!session) return
-    sb.from('profiles').select('*').then(({ data }) => { setProfile(data?.find(p => p.id === session.user.id) || false); setNames(Object.fromEntries((data || []).map(p => [p.id, p.display_name]))) })
-    sb.from('chapters').select('*, questions(*)').order('chapter_number').then(({ data }) => setChapters(data || []))
-  }, [session, entered])
-  if (!ready) return <Sky />
-  return <><Sky />{!session ? <Login /> : profile === false ? <div className="wrap card">Your account isn't added as a member yet. See README step 3.</div>
-    : !profile ? null : !entered ? <Welcome onEnter={() => setEntered(true)} />
-    : cur ? <Chapter c={cur} me={session.user.id} names={names} back={() => setCur(null)} />
-    : <Home profile={profile} chapters={chapters} pick={setCur} />}</>
-}
+function Sky(){const stars=useRef(Array.from({length:34},()=>({x:Math.random()*100,y:Math.random()*100,d:Math.random()*4})));return <div className="sky" aria-hidden="true">{stars.current.map((s,i)=><i key={i} className="star" style={{left:s.x+'%',top:s.y+'%',animationDelay:s.d+'s'}}/>)}<span className="butterfly b1">🦋</span><span className="butterfly b2">🦋</span><span className="rose r1">🌹</span><span className="rose r2">🌹</span></div>}
+function Login(){const [email,E]=useState(''),[password,P]=useState(''),[error,S]=useState(''),[busy,B]=useState(false);const submit=async e=>{e.preventDefault();B(true);S('');const {error}=await sb.auth.signInWithPassword({email,password});S(error?.message||'');B(false)};return <main className="login shell"><div className="eyebrow">A PRIVATE LITTLE UNIVERSE</div><div className="big-emoji">🌙</div><h1>Somewhere between today and forever...</h1><p className="muted">This little world is just for us.</p><form onSubmit={submit} className="glass login-form"><label>Email<input type="email" autoComplete="username" required value={email} onChange={e=>E(e.target.value)}/></label><label>Password<input type="password" autoComplete="current-password" required value={password} onChange={e=>P(e.target.value)}/></label><button disabled={busy}>{busy?'Opening…':'Enter our little world ✨'}</button>{error&&<p className="error">{error}</p>}</form></main>}
+function ClockPanel({profile}){const [now,N]=useState(Date.now());useEffect(()=>{const t=setInterval(()=>N(Date.now()),1000);return()=>clearInterval(t)},[]);const target=new Date('2026-12-04T17:00:00-07:00').getTime(),s=Math.max(0,Math.floor((target-now)/1000));return <section className="glass clock-panel"><div className="clock-grid"><div><small>HYDERABAD · IST</small><strong>{fmt(now,'Asia/Kolkata')}</strong></div><div><small>ARIZONA · MST</small><strong>{fmt(now,'America/Phoenix')}</strong></div></div><div className="countdown"><small>COUNTING DOWN TO DECEMBER 4</small><strong>{Math.floor(s/86400)}<em>d</em> {Math.floor(s%86400/3600)}<em>h</em> {Math.floor(s%3600/60)}<em>m</em> {s%60}<em>s</em></strong></div></section>}
+function MusicDock({song,onClose}){const [playing,P]=useState(false),[volume,V]=useState(0);const audio=useRef(null);const direct=song?.song_url&&/\.(mp3|m4a|ogg|wav)(\?|$)/i.test(song.song_url);useEffect(()=>{P(false);V(0);if(audio.current){audio.current.pause();audio.current.currentTime=0}},[song?.song_url]);const toggle=async()=>{if(!direct)return;const el=audio.current;if(!el)return;if(el.paused){el.volume=0;await el.play();P(true);let v=0;const t=setInterval(()=>{v=Math.min(1,v+.08);if(el){el.volume=v;V(v)}if(v>=1)clearInterval(t)},70)}else{let v=el.volume;const t=setInterval(()=>{v=Math.max(0,v-.1);if(el)el.volume=v;if(v<=0){el?.pause();P(false);clearInterval(t)}},70)}};if(!song)return null;const src=embedUrl(song.song_url);return <aside className="music-dock glass"><div className="music-icon">♫</div><div className="music-meta"><small>OUR LITTLE SOUNDTRACK</small><strong>{song.song_title||'A song for you'}</strong><span>{song.song_artist||'Tap to listen'}</span></div>{direct?<><audio ref={audio} src={song.song_url} loop/><button className="round" onClick={toggle}>{playing?'Ⅱ':'▶'}</button></>:src?<a className="button compact" href={song.song_url} target="_blank" rel="noreferrer">Listen ↗</a>:<span className="muted tiny">Add a song link</span>}<button className="icon-button" aria-label="Close player" onClick={onClose}>×</button></aside>}
+function ChapterCard({chapter,onClick}){return <button className="chapter-tile glass" onClick={onClick}><span className="tile-day">DAY {chapter.chapter_number}</span><strong>{chapter.title}</strong><span className="tile-date">{new Date(chapter.chapter_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})} · 💌</span><span className="tile-arrow">↗</span></button>}
+function ResponseThread({question,me,names}){const [rows,R]=useState([]),[value,V]=useState(''),[status,S]=useState('');const load=useCallback(async()=>{const {data}=await sb.from('responses').select('*').eq('question_id',question.id).order('created_at');R(data||[]);const mine=(data||[]).find(x=>x.user_id===me);if(mine)V(mine.content)},[question.id,me]);useEffect(()=>{load();const ch=sb.channel('response-'+question.id).on('postgres_changes',{event:'*',schema:'public',table:'responses',filter:'question_id=eq.'+question.id},load).subscribe();return()=>{sb.removeChannel(ch)}},[load,question.id]);const save=async()=>{S('Saving…');const {error}=await sb.from('responses').upsert({question_id:question.id,user_id:me,content:value,updated_at:new Date().toISOString()},{onConflict:'question_id,user_id'});S(error?.message||'Saved ✓')};return <article className="glass thread"><h3>{question.question_text}</h3>{rows.filter(x=>x.user_id!==me).map(x=><p className="reply" key={x.id}>💬 <b>{names[x.user_id]||'Them'}:</b> {x.content}</p>)}<textarea aria-label="Your response" value={value} onChange={e=>V(e.target.value)} placeholder="Write your thoughts here…"/><div className="inline-actions"><button onClick={save}>Save response</button><small>{status}</small></div></article>}
+function Gallery({chapter,me,admin,media,onRefresh}){const [busy,B]=useState(false),[msg,M]=useState('');const items=media.filter(x=>x.chapter_number===chapter.chapter_number);const count=mediaLimit(chapter.chapter_number);const upload=async(slot,file)=>{if(!file)return;const allowed=chapter.chapter_number===8?['image/','video/'].some(x=>file.type.startsWith(x)):file.type.startsWith('image/');if(!allowed){M(chapter.chapter_number===8?'Choose an image or video.':'Days 1–7 accept images only.');return}if(file.size>50*1024*1024){M('Each file must be 50 MB or smaller.');return}B(true);M('Uploading…');const path=me+'/'+chapter.chapter_number+'/'+slot+'-'+uid()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const {error:up}=await sb.storage.from('amrith-private').upload(path,file,{upsert:false,contentType:file.type});if(up){M(up.message);B(false);return}const {error:db}=await sb.from('gallery_media').insert({chapter_number:chapter.chapter_number,slot_number:slot,storage_path:path,media_kind:isVideo(file)?'video':'image',uploaded_by:me,original_name:file.name});M(db?.message||'Added to our gallery ♡');B(false);onRefresh()};const remove=async item=>{if(!admin&&item.uploaded_by!==me)return;await sb.storage.from('amrith-private').remove([item.storage_path]);await sb.from('gallery_media').delete().eq('id',item.id);onRefresh()};return <section className="gallery-section"><div className="section-heading"><div><small>OUR PRIVATE GALLERY</small><h3>Little moments, kept close</h3></div><span className="muted">{items.length}/{count}</span></div><div className="gallery-grid">{Array.from({length:count},(_,i)=>{const slot=i+1,item=items.find(x=>x.slot_number===slot);return <div className="media-slot glass" key={slot}>{item?<MediaItem item={item} onRemove={()=>remove(item)} canRemove={admin||item.uploaded_by===me}/>:<label className="upload-slot"><span>＋</span><b>{chapter.chapter_number===8?'Memory':'Photo'} {slot}</b><small>{chapter.chapter_number===8?'Photo or video':'Add a photo'}</small><input type="file" accept={chapter.chapter_number===8?'image/*,video/*':'image/*'} disabled={busy} onChange={e=>upload(slot,e.target.files?.[0])}/></label>}</div>})}</div>{msg&&<p className="muted tiny">{msg}</p>}</section>}
+function MediaItem({item,onRemove,canRemove}){const [url,U]=useState('');useEffect(()=>{let live=true;sb.storage.from('amrith-private').createSignedUrl(item.storage_path,3600).then(({data})=>{if(live)U(data?.signedUrl||'')});return()=>{live=false}},[item.storage_path]);return <div className="media-content">{url&&(item.media_kind==='video'?<video src={url} controls playsInline/>:<a href={url} target="_blank" rel="noreferrer"><img src={url} alt="A shared memory"/></a>)}{canRemove&&<button className="delete-chip" onClick={onRemove} aria-label="Remove media">×</button>}</div>}
+function ChapterView({chapter,me,names,admin,onBack,onChapterUpdate,media,onRefresh,play}){const [edit,E]=useState(false),[title,T]=useState(chapter.title),[message,M]=useState(chapter.message),[songTitle,ST]=useState(chapter.song_title||''),[songArtist,SA]=useState(chapter.song_artist||''),[songUrl,SU]=useState(chapter.song_url||'');const questions=[...(chapter.questions||[])].sort((a,b)=>a.sort_order-b.sort_order);const save=async()=>{const {error}=await sb.from('chapters').update({title,message,song_title:songTitle,song_artist:songArtist,song_url:songUrl}).eq('id',chapter.id);if(!error){E(false);onChapterUpdate()}else alert(error.message)};return <main className="shell page"><button className="text-button" onClick={onBack}>← All chapters</button><div className="chapter-hero"><div className="eyebrow">CHAPTER {chapter.chapter_number} OF 8</div><h1>{chapter.title}</h1><p className="muted">{chapter.chapter_date}</p><div className="envelope">💌</div></div>{admin&&<div className="admin-tools glass"><button className="secondary" onClick={()=>E(!edit)}>{edit?'Close editor':'✎ Edit this chapter'}</button>{edit&&<div className="editor"><label>Chapter title<input value={title} onChange={e=>T(e.target.value)}/></label><label>Message<textarea value={message} onChange={e=>M(e.target.value)}/></label><div className="two-col"><label>Song title<input value={songTitle} onChange={e=>ST(e.target.value)}/></label><label>Artist<input value={songArtist} onChange={e=>SA(e.target.value)}/></label></div><label>Song URL<input value={songUrl} onChange={e=>SU(e.target.value)} placeholder="YouTube, Spotify or direct audio URL"/></label><button onClick={save}>Save chapter</button></div>}</div>}<article className="glass letter"><div className="eyebrow">A NOTE FOR YOU</div><p className="handwritten">{chapter.message}</p></article><div className="song-card glass"><div><small>THE SONG FOR THIS DAY</small><h3>{chapter.song_title||'A song for you'}</h3><p className="muted">{chapter.song_artist}</p></div><button onClick={()=>play(chapter)}>{chapter.song_url?'Play this song ♫':'Choose song'}</button></div><Gallery chapter={chapter} me={me} admin={admin} media={media} onRefresh={onRefresh}/>{questions.map(q=><ResponseThread key={q.id} question={q} me={me} names={names}/>)}</main>}
+function Timeline({items,admin,reload}){const [editing,E]=useState(null),[title,T]=useState(''),[detail,D]=useState(''),[date,DT]=useState('');const start=item=>{E(item.id);T(item.title);D(item.description||'');DT(item.event_date||'')};const save=async id=>{const {error}=await sb.from('story_milestones').update({title,description:detail,event_date:date||null}).eq('id',id);if(!error){E(null);reload()}else alert(error.message)};return <main className="shell page"><div className="page-heading"><div className="eyebrow">CHAPTERS OF US</div><h1>Our Story</h1><p>Little moments that became part of our story. ✨</p></div><div className="timeline">{items.map((item,i)=><article className="timeline-item" key={item.id}><div className="timeline-dot">{String(i+1).padStart(2,'0')}</div><div className="glass timeline-card">{admin&&editing===item.id?<><input value={title} onChange={e=>T(e.target.value)}/><textarea value={detail} onChange={e=>D(e.target.value)}/><label className="tiny">Date (optional)<input type="date" value={date} onChange={e=>DT(e.target.value)}/></label><button onClick={()=>save(item.id)}>Save</button><button className="secondary" onClick={()=>E(null)}>Cancel</button></>:<><small>{item.event_date?new Date(item.event_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'A MOMENT TO REMEMBER'}</small><h3>{item.title}</h3><p>{item.description}</p>{admin&&<button className="text-button" onClick={()=>start(item)}>Edit milestone ✎</button>}</>}</div></article>)}</div></main>}
+function Checklist({items,me,admin,reload}){const [checked,C]=useState({});const [adding,A]=useState(false),[label,L]=useState(''),[group,G]=useState('Something we must understand together');useEffect(()=>{const load=async()=>{const {data}=await sb.from('checklist_responses').select('*').eq('user_id',me);C(Object.fromEntries((data||[]).map(x=>[x.item_id,x.checked])))};load()},[me]);const toggle=async item=>{const next=!checked[item.id];C(p=>({...p,[item.id]:next}));await sb.from('checklist_responses').upsert({item_id:item.id,user_id:me,checked:next},{onConflict:'item_id,user_id'})};const add=async()=>{if(!label.trim())return;await sb.from('checklist_items').insert({group_name:group,label,sort_order:items.length+1});L('');A(false);reload()};const groups=[...new Set(items.map(x=>x.group_name))];return <main className="shell page"><div className="page-heading"><div className="eyebrow">A LITTLE LIST, NOT A TEST</div><h1>Dream Boy checklist</h1><p>Not about perfection. Just the little things that matter to us. ❤️</p></div>{groups.map(g=><section className="glass checklist-group" key={g}><h3>{g}</h3>{items.filter(x=>x.group_name===g).map(x=><label className="check-row" key={x.id}><input type="checkbox" checked={!!checked[x.id]} onChange={()=>toggle(x)}/><span>{x.label}</span></label>)}</section>)}{admin&&<div className="glass admin-tools"><button className="secondary" onClick={()=>A(!adding)}>＋ Add checklist item</button>{adding&&<div className="editor"><select value={group} onChange={e=>G(e.target.value)}>{groups.map(g=><option key={g}>{g}</option>)}</select><input value={label} onChange={e=>L(e.target.value)} placeholder="New item"/><button onClick={add}>Add item</button></div>}</div>}</main>}
+function Promises({items,me,reload}){const [value,V]=useState('');const add=async()=>{if(!value.trim())return;await sb.from('promises').insert({content:value.trim(),created_by:me});V('');reload()};return <main className="shell page"><div className="page-heading"><div className="eyebrow">A SMALL PLACE FOR BIG INTENTIONS</div><h1>Our promises</h1><p>Promises we choose freely, one day at a time.</p></div><section className="glass form-card"><textarea value={value} onChange={e=>V(e.target.value)} placeholder="A promise I want to make…"/><button onClick={add}>Add a promise ♡</button></section>{items.map(x=><article className="glass promise" key={x.id}><span>♡</span><p>{x.content}</p><small>{new Date(x.created_at).toLocaleDateString()}</small></article>)}</main>}
+function TimeCapsule({items,me,reload}){const [value,V]=useState(''),[date,D]=useState('2026-12-04T17:00');const add=async()=>{if(!value.trim())return;const {error}=await sb.from('time_capsules').insert({content:value.trim(),created_by:me,reveal_at:new Date(date).toISOString()});if(error)alert(error.message);else{V('');reload()}};return <main className="shell page"><div className="page-heading"><div className="eyebrow">OPEN WHEN THE TIME IS RIGHT</div><h1>Time capsule</h1><p>Leave a note for a future version of us.</p></div><section className="glass form-card"><textarea value={value} onChange={e=>V(e.target.value)} placeholder="A note for the future…"/><label>Reveal on<input type="datetime-local" value={date} onChange={e=>D(e.target.value)}/></label><button onClick={add}>Seal this note 💌</button></section>{items.map(x=><article className="glass promise" key={x.id}><small>OPENED · {new Date(x.reveal_at).toLocaleString()}</small><p>{x.content}</p></article>)}</main>}
+function AdminPanel({chapters,letter,setLetter,reload,preview,setPreview}){const [draft,D]=useState(letter);const [busy,B]=useState(false);useEffect(()=>D(letter),[letter]);const save=async()=>{B(true);const {error}=await sb.from('app_settings').upsert({key:'final_letter',value:draft,updated_by:(await sb.auth.getUser()).data.user.id},{onConflict:'key'});if(!error)setLetter(draft);else alert(error.message);B(false)};return <main className="shell page"><div className="page-heading"><div className="eyebrow">THE CONTROL ROOM</div><h1>Admin studio</h1><p>Keep the little details up to date.</p></div><section className="glass admin-tools"><h3>Preview as Thrinath</h3><p className="muted">Preview changes the display only. It does not sign in as him or change permissions.</p><button className={preview?'':'secondary'} onClick={()=>setPreview(!preview)}>{preview?'Exit Thrinath preview':'Preview as Thrinath'}</button></section><section className="glass admin-tools"><h3>Final letter</h3><textarea rows="9" value={draft} onChange={e=>D(e.target.value)}/><button disabled={busy} onClick={save}>{busy?'Saving…':'Save final letter'}</button></section><section className="glass admin-tools"><h3>Chapter editor</h3><p className="muted">Open any chapter and choose “Edit this chapter” to change its title, message and song.</p>{chapters.map(c=><p key={c.id}>Day {c.chapter_number} · {c.title}</p>)}</section></main>}
+function Welcome({onStart,profile}){return <main className="shell welcome"><div className="eyebrow">OPERATION: FIRST MEET</div><div className="welcome-flowers">🌹 ✦ 🦋 ✦ 🌹</div><h1>Somewhere between today and forever...</h1><p>A little world made of songs, questions, memories and you.</p><div className="envelope">💌</div><button onClick={onStart}>ENTER OUR LITTLE WORLD</button><p className="muted tiny">Ammu's little surprise for {profile.display_name}.</p></main>}
+function App(){const [session,S]=useState(null),[ready,R]=useState(false),[profile,P]=useState(null),[profiles,Ps]=useState([]),[chapters,C]=useState([]),[media,M]=useState([]),[milestones,Ms]=useState([]),[checklist,Ch]=useState([]),[promises,Pr]=useState([]),[capsules,Ca]=useState([]),[letter,L]=useState(''),[tab,T]=useState('chapters'),[current,Cu]=useState(null),[entered,En]=useState(false),[preview,Pre]=useState(false),[music,Mu]=useState(null);const admin=profile?.role==='admin'&&!preview;const reload=useCallback(async()=>{if(!session)return;const [p,c,q,m,t,k,pr,tc,settings]=await Promise.all([sb.from('profiles').select('*'),sb.from('chapters').select('*,questions(*)').order('chapter_number'),sb.from('gallery_media').select('*').order('slot_number'),sb.from('story_milestones').select('*').order('sort_order'),sb.from('checklist_items').select('*').order('sort_order'),sb.from('promises').select('*').order('created_at',{ascending:false}),sb.from('time_capsules').select('*').order('reveal_at'),sb.from('app_settings').select('*').eq('key','final_letter').maybeSingle()]);Ps(p.data||[]);P((p.data||[]).find(x=>x.id===session.user.id)||false);M(q.data||[]);Ms(m.data||[]);Ch(t.data||[]);Pr(k.data||[]);Ca(pr.data||[]);if(settings.data?.value)L(settings.data.value);C(c.data||[])},[session]);useEffect(()=>{sb.auth.getSession().then(({data})=>{S(data.session);R(true)});const {data}=sb.auth.onAuthStateChange((_e,s)=>S(s));return()=>data.subscription.unsubscribe()},[]);useEffect(()=>{if(session)reload()},[session,reload]);useEffect(()=>{if(!session)return;const channel=sb.channel('amrith-live').on('postgres_changes',{event:'*',schema:'public'},()=>reload()).subscribe();return()=>sb.removeChannel(channel)},[session,reload]);const names=useMemo(()=>Object.fromEntries(profiles.map(p=>[p.id,p.display_name])),[profiles]);const play=chapter=>{Mu(chapter);T('chapters')};const logout=async()=>{await sb.auth.signOut();S(null);P(null);En(false);Cu(null);Mu(null)};if(!ready)return null;if(!session)return <><Sky/><Login/></>;if(profile===false)return <main className="shell glass"><h2>One more little step</h2><p>Your account has not been added to the private members list yet. Ask the admin to add your profile in Supabase.</p><button className="secondary" onClick={logout}>Sign out</button></main>;if(!profile)return null;const viewedProfile=preview?profiles.find(p=>p.role==='member')||profile:profile;if(!entered)return <><Sky/><Welcome profile={viewedProfile} onStart={()=>En(true)}/></>;const chapter=chapters.find(c=>c.id===current);return <><Sky/><header className="topbar"><a className="brand" onClick={()=>{Cu(null);T('chapters')}}>🌹 AMRITH <span>· OUR LITTLE UNIVERSE</span></a><div className="user-actions">{preview&&<span className="preview-pill">THRINATH PREVIEW</span>}<span className="user-name">Hi, {viewedProfile.display_name}</span><button className="icon-button" onClick={logout}>↪</button></div></header>{current&&chapter?<ChapterView chapter={chapter} me={session.user.id} names={names} admin={admin} onBack={()=>Cu(null)} onChapterUpdate={reload} media={media} onRefresh={reload} play={play}/>:tab==='story'?<Timeline items={milestones} admin={admin} reload={reload}/>:tab==='checklist'?<Checklist items={checklist} me={session.user.id} admin={admin} reload={reload}/>:tab==='promises'?<Promises items={promises} me={session.user.id} reload={reload}/>:tab==='capsule'?<TimeCapsule items={capsules} me={session.user.id} reload={reload}/>:tab==='admin'&&admin?<AdminPanel chapters={chapters} letter={letter} setLetter={L} reload={reload} preview={preview} setPreview={Pre}/>:<main className="shell page"><section className="home-hero"><div className="eyebrow">A LITTLE WORLD FOR TWO</div><h1>Hello, {viewedProfile.display_name} <span>🦋</span></h1><p>Eight days, a thousand little feelings, one memory at a time.</p></section><ClockPanel profile={viewedProfile}/><div className="section-heading"><div><small>THE DAILY SURPRISES</small><h2>Our chapters</h2></div><span className="muted">ALL 8 OPEN ♡</span></div><div className="chapter-grid">{chapters.map(c=><ChapterCard key={c.id} chapter={c} onClick={()=>Cu(c.id)}/>)}</div><div className="final-letter glass"><div className="eyebrow">A LETTER, JUST FOR YOU</div><h2>When you reach the last page…</h2><p className="handwritten">{letter||'Some words are waiting at the end of our little story.'}</p><span className="envelope-small">💌</span></div></main>}<nav className="bottom-nav">{[['chapters','💌','Chapters'],['story','🦋','Our Story'],['checklist','♡','Checklist'],['promises','✧','Promises'],['capsule','⌛','Time capsule'],...(admin?[['admin','⚙','Admin']]:[])].map(([id,icon,label])=><button key={id} className={tab===id&&!current?'active':''} onClick={()=>{Cu(null);T(id)}}><span>{icon}</span><small>{label}</small></button>)}</nav><MusicDock song={music} onClose={()=>Mu(null)}/></>}
+export default App
