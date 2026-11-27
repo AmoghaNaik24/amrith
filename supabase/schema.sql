@@ -245,18 +245,31 @@ select c.id,q.t,q.o from public.chapters c join (values
 ) as q(n,t,o) on q.n=c.chapter_number;
 
 insert into public.checklist_items(group_name,label,sort_order) values
-('The little things I love','Kindness in the way he speaks to everyone',1),
-('The little things I love','Thoughtful gestures matter more than expensive gifts',2),
-('The little things I love','Flowers, handwritten notes and remembering tiny details',3),
-('The little things I love','Making each other laugh, even on ordinary days',4),
-('The way we show up','We communicate honestly, even when a conversation is difficult',5),
-('The way we show up','We respect each other''s boundaries and individuality',6),
-('The way we show up','We celebrate each other''s ambitions and achievements',7),
-('The way we show up','We make time and effort feel mutual',8),
-('Something we must understand together','The age gap and the different stages of life we may be in',9),
-('Something we must understand together','Our expectations, needs and pace should be discussed openly',10),
-('Something we must understand together','Family, culture and long-term plans deserve honest conversations',11),
-('Something we must understand together','Neither person should have to lose themselves to make this work',12);
+('Already fulfilled','Caring',1),
+('Already fulfilled','Love',2),
+('Already fulfilled','Height',3),
+('Already fulfilled','Man',4),
+('Already fulfilled','Mature',5),
+('Already fulfilled','Intelligent',6),
+('Already fulfilled','Efforts',7),
+('Already fulfilled','Respect',8),
+('Already fulfilled','Dancer',9),
+('Already fulfilled','Shared goals',10),
+('Already fulfilled','Responsibility',11),
+('Already fulfilled','Support',12),
+('Already fulfilled','Patience',13),
+('Already fulfilled','Guidance',14),
+('Yet to be discovered','Trust',15),
+('Yet to be discovered','Settled',16),
+('Yet to be discovered','Family',17),
+('Yet to be discovered','Acceptance',18),
+('Yet to be discovered','Privacy',19),
+('Yet to be discovered','Compatibility',20),
+('Yet to be discovered','Consistency',21),
+('Yet to be discovered','Honesty',22),
+('Yet to be discovered','Loyalty',23),
+('Yet to be discovered','Gym freak',24),
+('Something we must understand together','Age gap',25);
 
 insert into public.story_milestones(sort_order,title,description,event_date) values
 (1,'A little beginning','Somewhere, a conversation began to turn into a story.','2026-11-27'),
