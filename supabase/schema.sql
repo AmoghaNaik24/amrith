@@ -138,7 +138,7 @@ create policy "Owners and admins delete gallery items" on public.gallery_media f
 create policy "Owners and admins update gallery metadata" on public.gallery_media for update to authenticated using (uploaded_by=auth.uid() or public.is_admin()) with check (uploaded_by=auth.uid() or public.is_admin());
 create policy "Members view checklist items" on public.checklist_items for select to authenticated using (public.is_member());
 create policy "Admins manage checklist items" on public.checklist_items for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy "Members view checklist responses" on public.checklist_responses for select to authenticated using (public.is_member());
+create policy "Members view their own checklist responses" on public.checklist_responses for select to authenticated using (user_id=auth.uid() and public.is_member());
 create policy "Members save their checklist" on public.checklist_responses for insert to authenticated with check (user_id=auth.uid() and public.is_member());
 create policy "Members update their checklist" on public.checklist_responses for update to authenticated using (user_id=auth.uid()) with check (user_id=auth.uid());
 create policy "Members view story" on public.story_milestones for select to authenticated using (public.is_member());
