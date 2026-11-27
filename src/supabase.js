@@ -1,7 +1,7 @@
 // Device-local data layer. No network requests and no cross-device sync.
 const DB_KEY = 'amrith-local-db-v1'
 const SESSION_KEY = 'amrith-local-session-v1'
-const PASSWORD = import.meta.env.VITE_APP_PASSWORD || 'SET_LOCAL_PASSWORD_IN_ENV'
+const PASSWORD = import.meta.env.VITE_APP_PASSWORD || 'ammuThiru1107'
 const PEOPLE = {
   amogha: { id: 'local-amogha', display_name: 'Amogha', role: 'admin', timezone: 'Asia/Kolkata' },
   thrinath: { id: 'local-thrinath', display_name: 'Thrinath', role: 'member', timezone: 'America/Phoenix' },
