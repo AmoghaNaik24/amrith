@@ -13,6 +13,9 @@ jobs:
       - run: npm run build
         env:
           VITE_APP_PASSWORD: ${{ secrets.VITE_APP_PASSWORD }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_AMOGHA_EMAIL: ${{ secrets.VITE_AMOGHA_EMAIL }}
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
   deploy:
