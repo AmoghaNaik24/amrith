@@ -1,4 +1,10 @@
 // Device-local data layer. No network requests and no cross-device sync.
+import { createClient } from '@supabase/supabase-js'
+
+const cloudUrl = import.meta.env.VITE_SUPABASE_URL || 'https://missing-project.supabase.co'
+const cloudAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'missing-anon-key'
+export const cloud = createClient(cloudUrl, cloudAnonKey)
+
 const DB_KEY = 'amrith-local-db-v1'
 const SESSION_KEY = 'amrith-local-session-v1'
 const PASSWORD = import.meta.env.VITE_APP_PASSWORD || 'ammuThiru1107'
@@ -155,4 +161,4 @@ const storage={from(){return {
  async remove(paths){const d=await openFiles();await new Promise((resolve,reject)=>{const tx=d.transaction('files','readwrite');paths.forEach(p=>tx.objectStore('files').delete(p));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});return {data:paths.map(name=>({name})),error:null}},
  async createSignedUrl(path){const blob=await fileOp('readonly',path);if(!blob)return {data:null,error:{message:'Local file not found'}};return {data:{signedUrl:URL.createObjectURL(blob)},error:null}}
 }}}
-export const sb={auth,from,storage,channel(){return {on(){return this},subscribe(){return this}}},async removeChannel(){}}
+export const sb={auth:cloud.auth,from,storage,channel(){return {on(){return this},subscribe(){return this}}},async removeChannel(){}}
