@@ -84,3 +84,18 @@ button.secondary,.button.secondary{background:transparent;border-color:var(--lin
 @keyframes fade-in{from{opacity:0}to{opacity:1}}@keyframes letter-open{from{opacity:0;transform:translateY(35px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 .yesno-panel{position:relative;height:135px;padding-top:12px}.no-dodge{position:absolute;transition:left .16s,top .16s}
+
+.media-content{position:relative;display:flex;flex-direction:column;overflow:hidden}
+.media-content>a,.media-content>video{display:block;min-height:0;flex:1}
+.media-caption{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:4px;padding:6px;background:rgba(17,9,28,.88);backdrop-filter:blur(8px);flex-wrap:wrap}
+.media-caption input{flex:1;min-width:0;margin:0;padding:7px 8px;font-size:.68rem;border-radius:8px}
+.media-caption button{padding:7px 9px;font-size:.65rem}
+.replace-chip{position:relative;display:inline-flex;align-items:center;padding:7px 9px;border-radius:30px;background:#67385f;color:#fff;font-size:.65rem;cursor:pointer}
+.replace-chip input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.media-caption-text{position:absolute;bottom:0;left:0;right:0;margin:0;padding:8px;background:rgba(17,9,28,.78);font-size:.78rem}
+.check-item{border-top:1px solid rgba(255,255,255,.07);padding:4px 0 10px}
+.check-item .check-row{border:0;padding:9px 0 5px}
+.check-note{min-height:34px;height:auto;margin:0 0 5px 31px;width:calc(100% - 31px);padding:8px 10px;font-size:.75rem;background:rgba(7,4,15,.22);border-color:rgba(221,196,255,.12)}
+.check-admin{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-left:31px}
+.check-admin select,.check-admin input{width:auto;flex:1;min-width:110px;margin:3px 0;padding:7px 9px;font-size:.72rem}
+.check-admin button{padding:7px 10px;font-size:.68rem}
