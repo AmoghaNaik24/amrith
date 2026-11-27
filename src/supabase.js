@@ -109,7 +109,7 @@ function notify(){listeners.forEach(fn=>fn('SIGNED_IN',session))}
 const auth={
  async getSession(){return {data:{session},error:null}},
  onAuthStateChange(fn){listeners.add(fn);return {data:{subscription:{unsubscribe:()=>listeners.delete(fn)}}}},
- async signInWithPassword({email,password}){const name=String(email||'').trim().toLowerCase();if(!['amogha','thrinath'].includes(name)||password!==PASSWORD||PASSWORD==='SET_LOCAL_PASSWORD_IN_ENV')return {data:{user:null,session:null},error:{message:'Incorrect name or password. Check the local app password setup.'}};const person=PEOPLE[name];session={user:{id:person.id,email:name+'@local.amrith'},access_token:'local-session'};localStorage.setItem(SESSION_KEY,JSON.stringify(session));notify();return {data:{user:session.user,session},error:null}},
+ async signInWithPassword({email,password}){const name=String(email||'').trim().toLowerCase();if(!['amogha','thrinath','threeeenadh'].includes(name)||password!==PASSWORD||PASSWORD==='SET_LOCAL_PASSWORD_IN_ENV')return {data:{user:null,session:null},error:{message:'Incorrect name or password. Check the local app password setup.'}};const person=PEOPLE[name==='threeeenadh'?'thrinath':name];session={user:{id:person.id,email:name+'@local.amrith'},access_token:'local-session'};localStorage.setItem(SESSION_KEY,JSON.stringify(session));notify();return {data:{user:session.user,session},error:null}},
  async signOut(){session=null;localStorage.removeItem(SESSION_KEY);listeners.forEach(fn=>fn('SIGNED_OUT',null));return {error:null}},
  async getUser(){return {data:{user:session?.user||null},error:null}},
 }
