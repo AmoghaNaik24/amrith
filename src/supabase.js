@@ -99,7 +99,7 @@ function seed() {
     promises:[],time_capsules:[],app_settings:[{key:'final_letter',value:'A giver always deserves another giver, and I will be your giver forever.\n\nWill you hold my hand forever? ❤️'}],
   }
 }
-function loadDB(){try{const raw=localStorage.getItem(DB_KEY);const data=raw?JSON.parse(raw):seed();const th=data.profiles?.find(p=>p.id==='local-thrinath');if(th)th.display_name='Threeeenadh';for(const c of data.chapters||[]){if(!c.song_url||! /\\.(mp3|m4a|ogg|wav)(\\?|$)/i.test(c.song_url)){c.song_title='A Little Instrumental';c.song_artist='SoundHelix';c.song_url='https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}}return data}catch{return seed()}}
+function loadDB(){try{const raw=localStorage.getItem(DB_KEY);const data=raw?JSON.parse(raw):seed();const th=data.profiles?.find(p=>p.id==='local-thrinath');if(th)th.display_name='Threeeenadh';for(const c of data.chapters||[]){if(!c.song_url||c.song_url.includes('youtube.com')||c.song_url.includes('youtu.be')){c.song_title='A Little Instrumental';c.song_artist='SoundHelix';c.song_url='https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}}return data}catch{return seed()}}
 let db=loadDB()
 function persist(){localStorage.setItem(DB_KEY,JSON.stringify(db))}
 let session=null
